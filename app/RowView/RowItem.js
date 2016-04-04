@@ -57,19 +57,11 @@ export default class RowItem extends React.Component {
         var renderedSequence = columnizeString(sequence, columnWidth);
         var renderedComplement = columnizeString(complement, columnWidth);
 
-        this.setState({
+        return {
             renderedSequence: renderedSequence,
             renderedComplement: renderedComplement,
             renderedOffset: (offset || 0) + 1
-        });
-    }
-
-    componentWillMount() {
-        this._processProps(this.props);
-    }
-
-    componentWillReceiveProps(nextProps) {
-        this._processProps(nextProps);
+        };
     }
 
     render() {
@@ -81,7 +73,7 @@ export default class RowItem extends React.Component {
             renderedSequence,
             renderedComplement,
             renderedOffset
-        } = this.state;
+        } = this._processProps(this.props);
 
         return (
             <div className={styles.rowItem + ' ' + className}>
