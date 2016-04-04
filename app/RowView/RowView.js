@@ -6,7 +6,7 @@ import styles from './RowView.scss';
 import assign from 'lodash/object/assign';
 import ResizeSensor from 'css-element-queries/src/ResizeSensor';
 
-import RowItem from './RowItem.js';
+import Row from './Row.js';
 
 @propTypes({
     embedded: PropTypes.bool.isRequired,
@@ -80,9 +80,9 @@ export default class RowView extends React.Component {
                 style={ embedded ? { display: 'none' } : null } // prime this inline for embedded version
             >
                 <div ref={'fontMeasure'} className={styles.fontMeasure}>m</div>
-                <RowItem ref={'rowMeasure'} sequenceData={{ sequence: '' }} className={styles.rowMeasure} />
+                <Row ref={'rowMeasure'} sequenceData={{ sequence: '' }} className={styles.rowMeasure} />
                 {
-                    rowData.map(datum => <RowItem sequenceData={datum} columnWidth={columnWidth} />)
+                    rowData.map(datum => <Row sequenceData={datum} columnWidth={columnWidth} />)
                 }
             </div>
         );
