@@ -12,12 +12,6 @@ import styles from './Row.scss';
 })
 export default class Row extends React.Component {
 
-    constructor(props) {
-        super(props);
-
-        this.state = {};
-    }
-
     getMaxSequenceLength(charWidth, columnWidth) {
         var sequenceWidthPx = elementWidth(this.refs.sequenceContainer);
         return calculateRowLength(charWidth, sequenceWidthPx, columnWidth);
