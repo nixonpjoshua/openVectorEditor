@@ -60,7 +60,8 @@ export default class Row extends React.Component {
 
     render() {
         var {
-            className
+            className,
+            sequenceData: { offset }
         } = this.props;
 
         var {
@@ -75,7 +76,7 @@ export default class Row extends React.Component {
                     {renderedOffset}
                 </div>
 
-                <svg ref={'sequenceContainer'} className={styles.sequenceContainer}>
+                <svg data-offset={offset} ref={'sequenceContainer'} className={styles.sequenceContainer}>
                     <text ref={'sequence'} className={styles.sequence}>
                         <tspan className={styles.sequence}>
                             {renderedSequence}
