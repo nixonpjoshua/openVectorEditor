@@ -1,15 +1,11 @@
-import React, { PropTypes } from 'react';
-import { propTypes } from '../react-props-decorators.js';
+import React  from 'react';
+import { Decorator as Cerebral } from 'cerebral-view-react';
 
 import getComplementSequenceString from 've-sequence-utils/getComplementSequenceString';
 import { columnizeString, elementWidth, calculateRowLength } from './Utils';
 
 import styles from './Row.scss';
 
-@propTypes({
-    sequenceData: PropTypes.object.isRequired,
-    columnWidth: PropTypes.number
-})
 export default class Row extends React.Component {
 
     getMaxSequenceLength(charWidth, columnWidth) {
@@ -37,13 +33,15 @@ export default class Row extends React.Component {
     _processProps(props) {
         var {
             sequenceData,
-            columnWidth
+            columnWidth,
+            selectionLayer
         } = props;
 
         var {
             sequence,
             offset,
-            className
+            className,
+            charWidth
         } = sequenceData;
 
         var complement = getComplementSequenceString(sequence);
@@ -51,23 +49,39 @@ export default class Row extends React.Component {
         var renderedSequence = columnizeString(sequence, columnWidth);
         var renderedComplement = columnizeString(complement, columnWidth);
 
+        var renderedSelectionLayer = {};
+
+        if (selectionLayer) {
+            renderedSelectionLayer.start = selectionLayer.start - offset;
+            renderedSelectionLayer.end = selectionLayer.end - offset;
+        }
+
+        renderedSelectionLayer.toString = function() {
+            var x = this.start * charWidth;
+            var width = this.end * charWidth;
+
+            return `${x},0 ${x},10, ${width},10 ${width},0`;
+        }
+
         return {
             renderedSequence: renderedSequence,
             renderedComplement: renderedComplement,
-            renderedOffset: (offset || 0) + 1
+            renderedOffset: (offset || 0) + 1,
+            renderedSelectionLayer: renderedSelectionLayer
         };
     }
 
     render() {
         var {
             className,
-            sequenceData: { offset }
+            sequenceData: { offset, charWidth }
         } = this.props;
 
         var {
             renderedSequence,
             renderedComplement,
-            renderedOffset
+            renderedOffset,
+            renderedSelectionLayer
         } = this._processProps(this.props);
 
         return (
@@ -86,6 +100,8 @@ export default class Row extends React.Component {
                             {renderedComplement}
                         </tspan>
                     </text>
+
+                    <polygon points={renderedSelectionLayer} style={{fill: 'red', stroke: 'blue'}} />
                 </svg>
             </div>
         );
