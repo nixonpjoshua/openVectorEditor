@@ -2,7 +2,7 @@ import React  from 'react';
 import { Decorator as Cerebral } from 'cerebral-view-react';
 
 import getComplementSequenceString from 've-sequence-utils/getComplementSequenceString';
-import { columnizeString, elementWidth, calculateRowLength } from './Utils';
+import { columnizeString, elementWidth, calculateRowLength, sliceLayer, layerInBounds } from './Utils';
 
 import styles from './Row.scss';
 
@@ -49,19 +49,7 @@ export default class Row extends React.Component {
         var renderedSequence = columnizeString(sequence, columnWidth);
         var renderedComplement = columnizeString(complement, columnWidth);
 
-        var renderedSelectionLayer = {};
-
-        if (selectionLayer) {
-            renderedSelectionLayer.start = selectionLayer.start - offset;
-            renderedSelectionLayer.end = selectionLayer.end - offset;
-        }
-
-        renderedSelectionLayer.toString = function() {
-            var x = this.start * charWidth;
-            var width = this.end * charWidth;
-
-            return `${x},0 ${x},10, ${width},10 ${width},0`;
-        }
+        var renderedSelectionLayer = sliceLayer(selectionLayer, offset, columnWidth, charWidth);
 
         return {
             renderedSequence: renderedSequence,
@@ -101,7 +89,11 @@ export default class Row extends React.Component {
                         </tspan>
                     </text>
 
-                    <polygon points={renderedSelectionLayer} style={{fill: 'red', stroke: 'blue'}} />
+                    {layerInBounds(renderedSelectionLayer, {start: 0, end: renderedSequence.length * charWidth}) &&
+                        <svg viewBox={'0 0 1 1'} preserveAspectRatio={'none'} x={renderedSelectionLayer.start} y={0} width={renderedSelectionLayer.width} height={'100%'}>
+                            <polygon points={'0 0, 0 1, 1 1, 1 0'} style={{fill: 'blue', opacity: 0.4}} />
+                        </svg>
+                    }
                 </svg>
             </div>
         );
