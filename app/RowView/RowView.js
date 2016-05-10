@@ -96,6 +96,8 @@ export default class RowView extends React.Component {
     }
 
     _startDrag(event) {
+        event.preventDefault();
+
         var {
             signals: {editorDragStarted}
         } = this.props;
@@ -110,6 +112,8 @@ export default class RowView extends React.Component {
     }
 
     _drag(event) {
+        event.preventDefault();
+
         if (!this.state.dragging) return;
 
         var {
@@ -124,6 +128,8 @@ export default class RowView extends React.Component {
     }
 
     _stopDrag(event) {
+        event.preventDefault();
+
         var {
             signals: {editorDragStopped}
         } = this.props;
