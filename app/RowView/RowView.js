@@ -86,15 +86,11 @@ export default class RowView extends React.Component {
 
         var offset = parseInt(currentEl.getAttribute('data-offset'));
         var clickX = event.pageX;
-        console.log('cx ', clickX);
         var elX = target.getBoundingClientRect().left;
         elX = Math.floor(elX + 0.5);
-        console.log('ex ', elX);
         var localX = clickX - elX;
-        console.log('lx ', localX);
         var localBP = Math.floor(localX / charWidth + 0.5);
         localBP = localBP - Math.floor(localBP / columnWidth)
-        console.log('lbp ', localBP);
 
         return offset + localBP;
     }
