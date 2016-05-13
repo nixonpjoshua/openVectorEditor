@@ -138,6 +138,20 @@ export default class RowView extends React.Component {
         this.setState({dragging: false});
     }
 
+    _annotationClick(annotation) {
+        var {
+            signals: {setSelectionLayer}
+        } = this.props;
+
+        setSelectionLayer({
+            selectionLayer: {
+                start: annotation.start,
+                end: annotation.end,
+                selected: true
+            }
+        });
+    }
+
     render() {
         var {
             columnWidth,
@@ -160,7 +174,7 @@ export default class RowView extends React.Component {
                 <div ref={'fontMeasure'} className={styles.fontMeasure}>m</div>
                 <Row ref={'rowMeasure'} sequenceData={{ sequence: '' }} className={styles.rowMeasure} />
                 {
-                    rowData.map(datum => <Row sequenceData={datum} columnWidth={columnWidth} selectionLayer={selectionLayer} />)
+                    rowData.map(datum => <Row onAnnotationClick={this._annotationClick.bind(this)} sequenceData={datum} columnWidth={columnWidth} selectionLayer={selectionLayer} />)
                 }
             </div>
         );
