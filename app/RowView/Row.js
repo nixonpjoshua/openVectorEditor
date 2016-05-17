@@ -110,6 +110,8 @@ export default class Row extends React.Component {
             renderedSelectionLayer
         } = this._processProps(this.props);
 
+        var featureIndex = 0;
+
         return (
             <div className={styles.rowItem + ' ' + className}>
                 <div className={styles.margin}>
@@ -136,16 +138,19 @@ export default class Row extends React.Component {
                     </svg>
 
                     <svg ref={'annotationContainer'} className={styles.annotationContainer}>
-                        {features && features.map((feature, index) => {
+                        {features && features.map((feature) => {
                              var slicedFeature = this._sliceLayer(feature);
                              var render = null;
 
-                             if (layerInBounds(slicedFeature, {start: 0, end: renderedSequence.length * charWidth}))
+                             if (layerInBounds(slicedFeature, {start: 0, end: renderedSequence.length * charWidth})) {
                                  render = (
-                                     <svg viewBox={'0 0 1 1'} preserveAspectRatio={'none'} x={slicedFeature.start} y={(index * 1.2) + 'em'} width={slicedFeature.width} height={'1em'}>
+                                     <svg viewBox={'0 0 1 1'} preserveAspectRatio={'none'} x={slicedFeature.start} y={(featureIndex * 1.2) + 'em'} width={slicedFeature.width} height={'1em'}>
                                          <polygon onClick={function() { onAnnotationClick(feature) }} points={'0 0, 0 1, 1 1, 1 0'} fill={feature.color} opacity={'0.4'} strokeWidth={1} stroke={feature.color} />
                                      </svg>
                                  );
+
+                                 featureIndex++;
+                             }
 
                              return render;
                          })}
