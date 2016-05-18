@@ -1,17 +1,14 @@
 import React, { PropTypes } from 'react';
-
 import { Decorator as Cerebral } from 'cerebral-view-react';
 import { propTypes } from './react-props-decorators.js';
-
 import TextField from 'material-ui/lib/text-field';
-
 import AddBoxIcon from 'material-ui/lib/svg-icons/content/add-box';
 import IndeterminateCheckBoxIcon from 'material-ui/lib/svg-icons/toggle/indeterminate-check-box';
 import IconButton from 'material-ui/lib/icon-button';
-
-var assign = require('lodash/object/assign');
+import assign from 'lodash/object/assign';
 
 @Cerebral({})
+
 export default class FeatureForm extends React.Component {
 
     constructor(props) {
@@ -29,6 +26,7 @@ export default class FeatureForm extends React.Component {
     }
 
     update() {
+        // {{}} theres a better way to do this, willget to later
         clearTimeout(this.state.timeout);
 
         var timeout = setTimeout(() => {
@@ -45,19 +43,18 @@ export default class FeatureForm extends React.Component {
 
     onChange(event) {
         this.state.feature[event.target.id] = event.target.value;
-
         this.update();
     }
 
     render() {
         return (
-            <div>
+            <div style={{backgroundColor: 'white', marginLeft: '580px', position: 'fixed', padding: '20px', width: '300px', border: '1px solid #ccc', zIndex: '55'}}>
               <TextField
                  id={"id"}
                  disabled={true}
                  onChange={this.onChange.bind(this)}
                  floatingLabelText={"id"}
-                 value={this.state.feature.id.toString()}
+                 value={ this.state.feature.id ? this.state.feature.id.toString() : "" }
                  />
 
               <br />
@@ -110,5 +107,4 @@ export default class FeatureForm extends React.Component {
             </div>
         );
     }
-
 }

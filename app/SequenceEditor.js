@@ -3,16 +3,15 @@ import { propTypes } from './react-props-decorators.js'; //tnrtodo: update this 
 import {Decorator as Cerebral} from 'cerebral-view-react';
 import ToolBar from './ToolBar';
 import StatusBar from './StatusBar';
-import AnnotationTable from './AnnotationTable';
+import SideBar from './SideBar';
 import styles from './sequence-editor.css';
 
-var Combokeys = require("combokeys");
-var combokeys;
 var bindGlobalPlugin = require('combokeys/plugins/global-bind');
-
-var RowView = require('./RowView/RowView');
 var CircularView = require('./CircularView');
 var Clipboard = require('./Clipboard');
+var Combokeys = require("combokeys");
+var combokeys;
+var RowView = require('./RowView/RowView');
 
 @Cerebral({
     sequenceLength: ['sequenceLength'],
@@ -27,27 +26,13 @@ var Clipboard = require('./Clipboard');
     showCircular: ['showCircular'],
     showLinear: ['showLinear'],
     showRow: ['showRow'],
-    annotationTableType: ['annotationTableType'],
+    showSidebar: ['showSidebar'],
+    sidebarType: ['sidebarType'],
     cutsites: ['cutsites'],
     orfData: ['orfData']
 })
-@propTypes({
-    sequenceLength: PropTypes.number.isRequired,
-    bpsPerRow: PropTypes.number.isRequired,
-    totalRows: PropTypes.number.isRequired,
-    newRandomRowToJumpTo: PropTypes.object,
-    selectedSequenceString: PropTypes.string.isRequired,
-    caretPosition: PropTypes.number.isRequired,
-    sequenceData: PropTypes.object.isRequired,
-    selectionLayer: PropTypes.object.isRequired,
-    clipboardData: PropTypes.object.isRequired,
-    showCircular: PropTypes.bool.isRequired,
-    showLinear: PropTypes.bool.isRequired,
-    showRow: PropTypes.bool.isRequired,
-    annotationTableType: PropTypes.string.isRequired
-})
 
-class SequenceEditor extends React.Component {
+export default class SequenceEditor extends React.Component {
     componentDidMount() {
         var {
             sequenceDataInserted,
@@ -57,12 +42,9 @@ class SequenceEditor extends React.Component {
         } = this.props.signals;
         var self = this;
         combokeys = new Combokeys(document.documentElement);
-        // combokeys = new Combokeys(React.findDOMNode(this.refs.sequenceEditor));
         bindGlobalPlugin(combokeys);
 
         //bind a bunch of keyboard shortcuts we're interested in catching
-        //we're using the "mousetrap" library (available thru npm: https://www.npmjs.com/package/br-mousetrap)
-        //documentation: https://craig.is/killing/mice
         combokeys.bind(['a', 'b', 'c', 'd', 'g', 'h', 'k', 'm', 'n', 'r', 's', 't', 'v', 'w', 'y'], function(event) { // type in bases
             sequenceDataInserted({newSequenceData: {sequence: String.fromCharCode(event.charCode)}});
         });
@@ -130,44 +112,48 @@ class SequenceEditor extends React.Component {
     }
 
     componentWillUnmount() {
-
-        // Remove any Mousetrap bindings before unmounting.detach()
         combokeys.detach()
     }
+
     render() {
         var {
             selectedSequenceString,
             sequenceData,
             showCircular,
             showRow,
-            annotationTableType,
+            showSidebar,
+            sidebarType,
             cutsites,
             orfData
         } = this.props;
 
         var table;
+        var sidebarStyle = {};
+        // we need this position relative to place the controller bar in the sidebar
+        Object.assign(sidebarStyle, {minWidth: '580px', overflow: 'hidden', borderRight: '1px solid #ccc', position: 'relative'}, (showSidebar) ? {} : {display: 'none'})
 
-        if (annotationTableType === 'features') {
+        // this should probably move to the sidebar file
+        if (sidebarType === 'Features') {
             table = (
-                <AnnotationTable
+                <SideBar
                    data={sequenceData.features}
-                   annotationType={annotationTableType}
+                   annotationType={sidebarType}
                    filter={['name', 'type', 'start', 'end', 'strand']}
                    />
             );
-        } else if (annotationTableType === 'cutsites') {
+        } else if (sidebarType === 'Cutsites') {
             table = (
-                <AnnotationTable
+                <SideBar
                    data={cutsites}
-                   annotationType={annotationTableType}
+                   annotationType={sidebarType}
                    filter={['name', 'start', 'end', 'strand']}
                    />
             );
-        } else if (annotationTableType === 'orfs') {
+        } else if (sidebarType === 'Orfs') {
             table = (
-                <AnnotationTable
+                <SideBar
                    data={orfData}
-                   annotationType={annotationTableType}
+                   annotationType={sidebarType}
                    filter={['start', 'end', 'length', 'strand', 'frame']}
                    />
             );
@@ -186,7 +172,7 @@ class SequenceEditor extends React.Component {
                 </div>
 
                 <div className={styles.content} id="allViews">
-                    <div className={styles.sideBarSlot} id="sideBar" style={(table) ? {} : {display: 'none'}}>
+                    <div className={styles.sideBarSlot} id="sideBar" style={ sidebarStyle }>
                       {table}
                     </div>
 
@@ -205,5 +191,3 @@ class SequenceEditor extends React.Component {
         );
     }
 }
-
-module.exports = SequenceEditor;
