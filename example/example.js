@@ -15,7 +15,22 @@ request
     .set('X-ICE-Authentication-sessionId', sid)
     .accept('application/json')
     .end(function(err, result) {
-        var contents = result.body;
+        console.log(result)
+        if (result.body === null){
+            // fill with default values for a blank sequence
+            contents = {
+                "sequence" : "",
+                "name" : "null",
+                "isCircular" : true,
+                "canEdit" : true,
+                "seqId" : id,
+                "features" : []
+            }
+        }
+        else {
+            var contents = result.body;
+        }
+        console.log(contents)
         var sequence = contents.sequence;
         var name = contents.name;
         var isCircular = contents.isCircular;
