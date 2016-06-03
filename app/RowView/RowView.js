@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import {Decorator as Cerebral} from 'cerebral-view-react';
+import { Decorator as Cerebral } from 'cerebral-view-react';
 import styles from './RowView.scss';
 import assign from 'lodash/object/assign';
 import ResizeSensor from 'css-element-queries/src/ResizeSensor';
@@ -17,13 +17,13 @@ export default class RowView extends React.Component {
         super(props);
 
         this.state = {
-            rowData: []
+            rowData: [],
+            dragging: false
         };
     }
 
-    _populateRows() {
+    _measures() {
         var {
-            sequenceData,
             columnWidth
         } = this.props;
 
@@ -32,6 +32,17 @@ export default class RowView extends React.Component {
             rowMeasure
         } = this.refs;
 
+        var charWidth = fontMeasure.getBoundingClientRect().width;
+        var rowLength = rowMeasure.getMaxSequenceLength(charWidth, columnWidth);
+
+        return {charWidth, rowLength};
+    }
+
+    _populateRows() {
+        var {
+            sequenceData,
+        } = this.props;
+
         var {
             sequence,
             size
@@ -39,8 +50,7 @@ export default class RowView extends React.Component {
 
         if (size <= 0) return;
 
-        var charWidth = fontMeasure.getBoundingClientRect().width;
-        var rowLength = rowMeasure.getMaxSequenceLength(charWidth, columnWidth);
+        var {charWidth, rowLength} = this._measures();
 
         if (rowLength === 0) return;
 
@@ -50,6 +60,7 @@ export default class RowView extends React.Component {
             let data = {};
             data.sequence = sequence.substr(i, rowLength);
             data.offset = i;
+            data.charWidth = charWidth;
             data = assign({}, sequenceData, data);
             rowData.push(data);
         }
@@ -62,9 +73,89 @@ export default class RowView extends React.Component {
         this._populateRows();
     }
 
+    _getBpNearestClick(event) {
+        var columnWidth = this.props.columnWidth;
+        var {charWidth, rowLength} = this._measures();
+        var target = event.target;
+        var currentEl = target
+        var nearestBP = null;
+
+        while(isNaN(parseInt(currentEl.getAttribute('data-offset'))) && currentEl.parentElement) {
+            currentEl = currentEl.parentElement;
+        }
+
+        var offset = parseInt(currentEl.getAttribute('data-offset'));
+        var clickX = event.pageX;
+        var elX = target.getBoundingClientRect().left;
+        elX = Math.floor(elX + 0.5);
+        var localX = clickX - elX;
+        var localBP = Math.floor(localX / charWidth + 0.5);
+        localBP = localBP - Math.floor(localBP / columnWidth)
+
+        return offset + localBP;
+    }
+
+    _startDrag(event) {
+        event.preventDefault();
+
+        var {
+            signals: {editorDragStarted}
+        } = this.props;
+
+        var nearestBP = this._getBpNearestClick(event);
+
+        if (nearestBP !== null) {
+            editorDragStarted({nearestBP, caretGrabbed: false});
+
+            this.setState({dragging: true});
+        }
+    }
+
+    _drag(event) {
+        event.preventDefault();
+
+        if (!this.state.dragging) return;
+
+        var {
+            signals: {editorDragged}
+        } = this.props;
+
+        var nearestBP = this._getBpNearestClick(event);
+
+        if (nearestBP !== null) {
+            editorDragged({nearestBP, caretGrabbed: false});
+        }
+    }
+
+    _stopDrag(event) {
+        event.preventDefault();
+
+        var {
+            signals: {editorDragStopped}
+        } = this.props;
+
+        editorDragStopped();
+        this.setState({dragging: false});
+    }
+
+    _annotationClick(annotation) {
+        var {
+            signals: {setSelectionLayer}
+        } = this.props;
+
+        setSelectionLayer({
+            selectionLayer: {
+                start: annotation.start,
+                end: annotation.end,
+                selected: true
+            }
+        });
+    }
+
     render() {
         var {
-            columnWidth
+            columnWidth,
+            selectionLayer
         } = this.props;
 
         var {
@@ -74,13 +165,16 @@ export default class RowView extends React.Component {
 
         return (
             <div ref={'rowView'}
-                className={ styles.rowView }
-                style={ embedded ? { display: 'none' } : null } // prime this inline for embedded version
-                >
+                 className={styles.rowView}
+                 style={ embedded ? { display: 'none' } : null } // prime this inline for embedded version
+                 onMouseDown={this._startDrag.bind(this)}
+                 onMouseMove={this._drag.bind(this)}
+                 onMouseUp={this._stopDrag.bind(this)}
+            >
                 <div ref={'fontMeasure'} className={styles.fontMeasure}>m</div>
-                <RowItem ref={'rowMeasure'} sequenceData={{ sequence: '' }} className={styles.rowMeasure} />
+                <Row ref={'rowMeasure'} sequenceData={{ sequence: '' }} className={styles.rowMeasure} />
                 {
-                    rowData.map(datum => <RowItem sequenceData={datum} columnWidth={columnWidth} />)
+                    rowData.map(datum => <Row onAnnotationClick={this._annotationClick.bind(this)} sequenceData={datum} columnWidth={columnWidth} selectionLayer={selectionLayer} />)
                 }
             </div>
         );

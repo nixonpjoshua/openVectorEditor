@@ -5,9 +5,20 @@
     display: flex;
 }
 
-.sequenceContainer {
+.containers {
     flex-grow: 1;
     dominant-baseline: hanging;
+}
+
+.sequenceContainer {
+    display: block;
+    width: 100%;
+}
+
+.annotationContainer {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
 }
 
 .sequence {

@@ -27,5 +27,9 @@ export default {
 
     elementWidth: function(elem) {
         return (elem) ? parseFloat(getComputedStyle(elem).width) : 0;
+    },
+
+    layerInBounds: function(layer, bounds) {
+        return ((layer.start <= bounds.end) && layer.start + layer.width >= bounds.start);
     }
 }

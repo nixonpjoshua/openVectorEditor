@@ -1,9 +1,7 @@
 import React  from 'react';
 import { Decorator as Cerebral } from 'cerebral-view-react';
-
 import getComplementSequenceString from 've-sequence-utils/getComplementSequenceString';
 import { columnizeString, elementWidth, calculateRowLength, layerInBounds } from './Utils';
-
 import styles from './Row.scss';
 
 export default class Row extends React.Component {
@@ -118,7 +116,7 @@ export default class Row extends React.Component {
                     {renderedOffset}
                 </div>
 
-                <div className={styles.containers}>
+                <div className={styles.containers}>              
                     <svg data-offset={offset} ref={'sequenceContainer'} className={styles.sequenceContainer}>
                         <text ref={'sequence'} className={styles.sequence}>
                             <tspan className={styles.sequence}>
@@ -136,7 +134,6 @@ export default class Row extends React.Component {
                          </svg>
                         }
                     </svg>
-
                     <svg ref={'annotationContainer'} className={styles.annotationContainer}>
                         {features && features.map((feature) => {
                              var slicedFeature = this._sliceLayer(feature);

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "app/App.js",
-  "repository": "https://github.com/TeselaGen/openVectorEditor",
+  "repository": "https://github.com/JBEI/openVectorEditor",
   "scripts": {
     "lint": "globstar --node -- eslint \"./app/**/*.js\"",
     "test": "npm run lint && NODE_ENV=testing karma start",
@@ -30,7 +30,6 @@
     "css-element-queries": "^0.3.2",
     "css-loader": "^0.23.0",
     "deep-equal": "^1.0.1",
-    "eslint": "^1.10.3",
     "get-substring-by-range": "^1.0.0",
     "interpolate": "^0.1.0",
     "interval-tree2": "github:tnrich/interval-tree2",
