@@ -1,7 +1,9 @@
 import React  from 'react';
 import { Decorator as Cerebral } from 'cerebral-view-react';
+
 import getComplementSequenceString from 've-sequence-utils/getComplementSequenceString';
 import { columnizeString, elementWidth, calculateRowLength, layerInBounds } from './Utils';
+
 import styles from './Row.scss';
 
 export default class Row extends React.Component {
@@ -116,7 +118,25 @@ export default class Row extends React.Component {
                     {renderedOffset}
                 </div>
 
-                <div className={styles.containers}>              
+                <div className={styles.containers}>
+                    <svg ref={'annotationContainer'} className={styles.annotationContainer}>
+                        {features && features.map((feature) => {
+                             var slicedFeature = this._sliceLayer(feature);
+                             var render = null;
+
+                             if (layerInBounds(slicedFeature, {start: 0, end: renderedSequence.length * charWidth})) {
+                                 render = (
+                                     <svg viewBox={'0 0 1 1'} preserveAspectRatio={'none'} x={slicedFeature.start} y={(featureIndex * 1.2) + 'em'} width={slicedFeature.width} height={'10px'}>
+                                         <polygon onClick={function() { onAnnotationClick(feature) }} points={'0 0, 0 1, 1 1, 1 0'} fill={feature.color} strokeWidth={1} stroke={feature.color} />
+                                     </svg>
+                                 );
+
+                                 featureIndex++;
+                             }
+
+                             return render;
+                         })}
+                    </svg>                
                     <svg data-offset={offset} ref={'sequenceContainer'} className={styles.sequenceContainer}>
                         <text ref={'sequence'} className={styles.sequence}>
                             <tspan className={styles.sequence}>
@@ -133,24 +153,6 @@ export default class Row extends React.Component {
                              <polygon points={'0 0, 0 1, 1 1, 1 0'} style={{fill: 'blue', opacity: 0.4}} />
                          </svg>
                         }
-                    </svg>
-                    <svg ref={'annotationContainer'} className={styles.annotationContainer}>
-                        {features && features.map((feature) => {
-                             var slicedFeature = this._sliceLayer(feature);
-                             var render = null;
-
-                             if (layerInBounds(slicedFeature, {start: 0, end: renderedSequence.length * charWidth})) {
-                                 render = (
-                                     <svg viewBox={'0 0 1 1'} preserveAspectRatio={'none'} x={slicedFeature.start} y={(featureIndex * 1.2) + 'em'} width={slicedFeature.width} height={'1em'}>
-                                         <polygon onClick={function() { onAnnotationClick(feature) }} points={'0 0, 0 1, 1 1, 1 0'} fill={feature.color} opacity={'0.4'} strokeWidth={1} stroke={feature.color} />
-                                     </svg>
-                                 );
-
-                                 featureIndex++;
-                             }
-
-                             return render;
-                         })}
                     </svg>
                 </div>
             </div>

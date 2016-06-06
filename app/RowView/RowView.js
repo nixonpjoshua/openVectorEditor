@@ -1,16 +1,16 @@
 import React, { PropTypes } from 'react';
 import { Decorator as Cerebral } from 'cerebral-view-react';
+
 import styles from './RowView.scss';
+
 import assign from 'lodash/object/assign';
 import ResizeSensor from 'css-element-queries/src/ResizeSensor';
-import RowItem from './RowItem.js';
+
+import Row from './Row.js';
 
 @Cerebral({
-    embedded: ['embedded'],
-    sequenceData: ['sequenceData'],
-    columnWidth: ['columnWidth']
+    selectionLayer: ['selectionLayer']
 })
-
 export default class RowView extends React.Component {
 
     constructor(props) {
